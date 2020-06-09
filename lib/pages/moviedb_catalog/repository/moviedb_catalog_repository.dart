@@ -21,35 +21,46 @@ class CatalogPageRepositoryImpl implements CatalogPageRepository {
   });
 
   @override
-  Future<Tuple2<int,List<PostModel>>> fetchPost(int page) async {
-    if (await networkInfo.isConnected) {                       // Если есть интернет соединение ТО
-      try {
-        final posts = await remoteDataSource.fetchPosts(page); // Загрузка данных ТО
-        if(page == 1) {                                        // Если загрузка первой страницы - очистка старого кэша ТО
-          await localDataSource.clearCache();
-        }
-        final postsToCache = List.generate(
-            posts.item2.length,
-            (index) => PostModel.toMap(posts.item2[index]),
-        );
-      await localDataSource.cachePost(postsToCache);            // Кэширование !
-        return posts;                                           // Отправка загруженных данных !
-      }
-      catch(_) {
-        throw Exception('error fetching data');
-      }
-    } else {                                                     // Если нет интернет соединения И
-      if (page == 1) {                                           // Если загрузка первой страницы ТО
-          final cachedPosts = await localDataSource.getPost();    // Загрузка данных из кэша ->
-
-          if( cachedPosts.isNotEmpty) {
-            return Tuple2(page,cachedPosts);                      // Отправка кэшированных данных !
-          } else {
-            return Tuple2(page,[]);                               // Если  пустой кэш ТО
-          }                                                       // Отправка пустого массива
-      } else {
-        return Tuple2(page,[]);                                   // Если нет интернет соединения И
-      }                                                           // Запрос страницы с номером 2 и выше ТО
-    }                                                             // Отправка пустого массива !
+  Future<Tuple2<int, List<PostModel>>> fetchPost(int page) async {
+    if (await networkInfo.isConnected) {
+      return _fetchIfConnectionIsOn(page);
+    } else {
+        return _fetchIfConnectionIsOff(page);
+    }
   }
+
+  Future<Tuple2<int,List<PostModel>>> _fetchIfConnectionIsOn (int page) async{
+    try {                                                    // Если есть интернет соединение ТО
+      final posts = await remoteDataSource.fetchPosts(page); // Загрузка данных ТО
+      if(page == 1) {                                        // Если загрузка первой страницы - очистка старого кэша ТО
+        await localDataSource.clearCache();
+      }
+      final postsToCache = List.generate(
+        posts.item2.length,
+            (index) => PostModel.toMap(posts.item2[index]),
+      );
+      await localDataSource.cachePost(postsToCache);            // Кэширование !
+      return posts;                                             // Отправка загруженных данных !
+    }
+    catch(_) {
+      throw Exception('error fetching data');
+    }
+  }
+
+  Future<Tuple2<int,List<PostModel>>> _fetchIfConnectionIsOff (int page) async {
+                                                              // Если нет интернет соединения И
+    if (page == 1) {                                          // Если загрузка первой страницы ТО
+      final cachedPosts = await localDataSource.getPost();    // Загрузка данных из кэша ->
+
+      if( cachedPosts.isNotEmpty) {
+        return Tuple2(page,cachedPosts);                      // Отправка кэшированных данных !
+      } else {
+        return Tuple2(page,[]);                               // Если  пустой кэш ТО
+      }                                                       // Отправка пустого массива
+    } else {
+      return Tuple2(page,[]);                                 // Если нет интернет соединения И
+    }                                                         // Запрос страницы с номером 2 и выше ТО
+  }                                                           // Отправка пустого массива !
 }
+
+
