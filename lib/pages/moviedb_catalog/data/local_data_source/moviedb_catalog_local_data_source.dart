@@ -11,12 +11,16 @@ abstract class CatalogPageLocalDataSource {
 }
 
 class CatalogPageLocalDataSourceImpl implements CatalogPageLocalDataSource {
-  static Future<Database> _getDatabase() async {
+   final _databaseName = "catalog_database.db";
+   final _databaseVersion = 1;
+   final _table = 'catalog';
+
+     Future<Database> _getDatabase() async {
     return openDatabase(
-      join(await getDatabasesPath(), 'catalog_database.db'),
+      join(await getDatabasesPath(), _databaseName),
       onCreate: (db, version) {
           return db.execute(
-            '''CREATE TABLE catalog(
+            '''CREATE TABLE $_table(
             id INTEGER PRIMARY KEY,
             title TEXT,
             body TEXT,
@@ -25,17 +29,19 @@ class CatalogPageLocalDataSourceImpl implements CatalogPageLocalDataSource {
             '''
           );
       },
-      version: 1,
+      version: _databaseVersion,
     );
   }
+
+  static Database db;
 
   @override
   Future<void> cachePost(List<Map<String, dynamic>> postsToCache) async{
      try {
-       final Database db = await _getDatabase();
+        db = await _getDatabase();
        postsToCache.forEach((post) async{
          await db.insert(
-           'catalog',
+           _table,
            post,
            conflictAlgorithm: ConflictAlgorithm.replace,
          );
@@ -47,8 +53,8 @@ class CatalogPageLocalDataSourceImpl implements CatalogPageLocalDataSource {
 
   @override
   Future<List<PostModel>> getPost() async{
-    final Database db = await _getDatabase();
-    final List<Map<String, dynamic>> maps = await db.query('catalog');
+    db = await _getDatabase();
+    final List<Map<String, dynamic>> maps = await db.query(_table);
     return List.generate(
          maps.length,
         (index) {
@@ -59,8 +65,8 @@ class CatalogPageLocalDataSourceImpl implements CatalogPageLocalDataSource {
 
   @override
   Future<void> clearCache() async{
-    final Database db = await _getDatabase();
-    await db.execute('DELETE FROM catalog');
+    db = await _getDatabase();
+    await db.execute('DELETE FROM $_table');
   }
 
 }

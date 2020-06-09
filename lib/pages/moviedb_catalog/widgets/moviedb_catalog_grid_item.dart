@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movidblist/pages/moviedb_catalog/model/moviedb_catalog_model.dart';
+import 'package:movidblist/pages/moviedb_detail/bloc/bloc.dart';
+import 'package:movidblist/pages/moviedb_detail/moviedb_detail_page.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 
@@ -32,8 +34,8 @@ class GridItem extends StatelessWidget {
               .of(context)
               .push(MaterialPageRoute(
             builder:(context){
-//              BlocProvider.of<DetailPageBloc>(context).add(DetailPageGetDetail(id: post.id));
-//              return DetailPage(id: post.id,);
+              BlocProvider.of<DetailPageBloc>(context).add(DetailPageGetDetail(id: post.id));
+              return DetailPage();
             },
           )
           );

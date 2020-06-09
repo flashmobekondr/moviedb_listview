@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movidblist/pages/moviedb_catalog/widgets/moviedb_catalog_widgets.dart';
 
-import 'moviedb_catalog/bloc/bloc.dart';
+import 'bloc/bloc.dart';
 
 
 
