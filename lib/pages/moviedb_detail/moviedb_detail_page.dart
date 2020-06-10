@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:movidblist/pages/moviedb_detail/bloc/bloc.dart';
+import 'package:movidblist/pages/moviedb_detail/widgets/moviedb_detail_page_success.dart';
 
 
 class DetailPage extends StatelessWidget {
@@ -24,36 +25,9 @@ class DetailPage extends StatelessWidget {
           );
         }
         if(state is DetailPageStateSuccess) {
-            return Scaffold(
-                appBar: AppBar(
-                  title: Text(state.item.title),
-                ),
-                body: ListView(
-                  children: <Widget>[
-                    CachedNetworkImage(
-                      imageUrl: state.item.posterUrl,
-                      placeholderFadeInDuration: Duration(milliseconds: 400),
-                    ),
-                    Text(state.item.title),
-                    Text(state.item.body),
-                    Text(state.item.releaseDate.year.toString()),
-                    Text(state.item.rating.toString()),
-                    RatingBar(
-                      itemSize: 16,
-                      initialRating: state.item.rating,
-                      minRating: 1,
-                      direction: Axis.horizontal,
-                      allowHalfRating: true,
-                      itemCount: 10,
-                      //itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                      itemBuilder: (context, _) => Icon(
-                        Icons.star,
-                        color: Colors.amber,
-                      ),
-                    )
-                  ],
-                )
-            );
+          return DetailPageSuccess(
+            state: state,
+          );
         }
         return Text('');
       },
