@@ -5,8 +5,8 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 abstract class DetailPageLocalDataSource {
-  Future<DetailPostModel> getPost();
-  Future<void> cachePost(Map<String, dynamic> postToCache);
+  Future<List<DetailPostModel>> getPost(int id);
+  Future<void> cachePost(DetailPostModel postToCache);
   Future<void> clearCache ();
 }
 
@@ -26,7 +26,7 @@ class DetailPageLocalDataSourceImpl implements DetailPageLocalDataSource {
             posterUrl TEXT,
             body TEXT,
             releaseDate TEXT,
-            rating DOUBLE
+            rating REAL
             )
             '''
         );
@@ -38,21 +38,40 @@ class DetailPageLocalDataSourceImpl implements DetailPageLocalDataSource {
   static Database db;
 
   @override
-  Future<void> cachePost(Map<String, dynamic> postToCache) {
-    // TODO: implement cachePost
-    throw UnimplementedError();
+  Future<void> cachePost(DetailPostModel postToCache) async{
+    db = await _getDatabase();
+    print('atemption 4');
+    await db.insert(
+        _table,
+        DetailPostModel.toMap(postToCache),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   @override
-  Future<void> clearCache() {
-    // TODO: implement clearCache
-    throw UnimplementedError();
+  Future<void> clearCache() async{
+    db = await _getDatabase();
+    await db.execute('DELETE FROM $_table');
   }
 
   @override
-  Future<DetailPostModel> getPost() {
-    // TODO: implement getPost
-    throw UnimplementedError();
+  Future<List<DetailPostModel>> getPost(int id) async{
+    db = await _getDatabase();
+    final List<Map<String, dynamic>> map = await db.query(
+        _table,
+      where: "id = ?",
+      whereArgs: [id]
+    );
+    if( map.isNotEmpty) {
+      return List.generate(
+          map.length,
+              (index) {
+            return DetailPostModel.fromMap(map[index]);
+          }
+      );
+    } else {
+      return [DetailPostModel()];
+    }
   }
 
 }

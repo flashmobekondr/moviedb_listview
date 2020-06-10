@@ -31,6 +31,7 @@ Future<void> init() async {
   sl.registerLazySingleton<DetailPageRepository>(
           () => DetailPageRepositoryImpl(
             remoteDataSource: sl(),
+            localDataSource: sl(),
             networkInfo: sl()
           )
   );
@@ -47,6 +48,9 @@ Future<void> init() async {
           () => DetailPageRemoteDataSourceImpl(
             client: sl()
           )
+  );
+  sl.registerLazySingleton<DetailPageLocalDataSource>(
+          () => DetailPageLocalDataSourceImpl()
   );
 
   //Core

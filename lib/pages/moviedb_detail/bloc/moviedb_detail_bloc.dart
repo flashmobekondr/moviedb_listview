@@ -16,7 +16,9 @@ class DetailPageBloc extends Bloc<DetailPageEvent, DetailPageState> {
       yield DetailPageStateLoading();
       try {
         final result = await repository.fetchPost(event.id);
-        yield DetailPageStateSuccess(item: result);
+        if(result.id != null) {
+          yield DetailPageStateSuccess(item: result);
+        } else yield DetailPageStateError('no internet connection');
       }
       catch(error) {
         yield DetailPageStateError(error);

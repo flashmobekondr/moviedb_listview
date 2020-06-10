@@ -16,7 +16,12 @@ class DetailPage extends StatelessWidget {
           );
         }
         if (state is DetailPageStateError) {
-          return Text(state.error);
+          return Scaffold(
+            appBar: AppBar(),
+            body: Center(
+              child: Text('${state.error}'),
+            ),
+          );
         }
         if(state is DetailPageStateSuccess) {
             return Scaffold(
